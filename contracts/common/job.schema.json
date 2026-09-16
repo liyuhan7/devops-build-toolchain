@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/contracts/job.schema.json",
+  "title": "Job",
+  "type": "object",
+  "required": ["schema_version", "job_id", "trace_id", "job_type", "status", "input", "created_at"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "job_id": { "type": "string", "minLength": 1 },
+    "trace_id": { "type": "string", "minLength": 1 },
+    "job_type": { "enum": ["DOCKERFILE_GENERATION", "FULL_CHECK", "INCREMENTAL_CHECK", "REPAIR"] },
+    "status": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "TIMED_OUT", "CANCELLED"] },
+    "input": { "type": "object" },
+    "output": { "type": ["object", "null"] },
+    "error": { "type": ["object", "null"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "started_at": { "type": ["string", "null"], "format": "date-time" },
+    "finished_at": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "additionalProperties": false
+}

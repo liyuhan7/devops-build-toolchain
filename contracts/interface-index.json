@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "base_path": "/v1",
+  "interfaces": [
+    { "job_type": "DOCKERFILE_GENERATION", "method": "POST", "path": "/dockerfile-jobs", "request": "draft/dockerfile-generation.request.json", "response": "draft/dockerfile-generation.response.json" },
+    { "job_type": "FULL_CHECK", "method": "POST", "path": "/full-check-jobs", "request": "buildchecker/full-check.request.json", "response": "buildchecker/full-check.response.json" },
+    { "job_type": "INCREMENTAL_CHECK", "method": "POST", "path": "/incremental-check-jobs", "request": "echecker/incremental-check.request.json", "response": "echecker/incremental-check.response.json" },
+    { "job_type": "REPAIR", "method": "POST", "path": "/repair-jobs", "request": "mdfixer/repair.request.json", "response": "mdfixer/repair.response.json" },
+    { "method": "GET", "path": "/jobs/{job_id}", "response": "common/job.schema.json" }
+  ]
+}

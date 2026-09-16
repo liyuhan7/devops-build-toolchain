@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/contracts/dependency-graph.schema.json",
+  "title": "DependencyGraph",
+  "type": "object",
+  "required": ["schema_version", "graph_type", "repository_commit", "configuration_id", "nodes", "edges"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "graph_type": { "enum": ["ACTUAL", "DECLARED"] },
+    "repository_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "configuration_id": { "type": "string", "minLength": 1 },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "path"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["TARGET", "FILE", "MACRO"] },
+          "path": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["target", "dependency"],
+        "properties": {
+          "target": { "type": "string" },
+          "dependency": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

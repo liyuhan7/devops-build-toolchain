@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "job_id": "job-draft-001",
+  "trace_id": "trace-pair01-c0",
+  "job_type": "DOCKERFILE_GENERATION",
+  "status": "SUCCEEDED",
+  "input": {},
+  "output": {
+    "dockerfile": {
+      "artifact_id": "dockerfile-001",
+      "type": "DOCKERFILE",
+      "uri": "artifact://pair01/draft001/Dockerfile",
+      "media_type": "text/plain",
+      "producer_job_id": "job-draft-001",
+      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "configuration_id": "gcc-default"
+    },
+    "image": {
+      "artifact_id": "image-001",
+      "type": "CONTAINER_IMAGE",
+      "uri": "docker://pair01/project:0123456",
+      "media_type": "application/vnd.oci.image.manifest.v1+json",
+      "producer_job_id": "job-draft-001",
+      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "configuration_id": "gcc-default"
+    },
+    "iterations": 4,
+    "iteration_log": {
+      "artifact_id": "draft-log-001",
+      "type": "DRAFT_ITERATION_LOG",
+      "uri": "artifact://pair01/draft001/iterations.json",
+      "media_type": "application/json",
+      "producer_job_id": "job-draft-001",
+      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "configuration_id": "gcc-default"
+    },
+    "build_result": { "success": true, "exit_code": 0 },
+    "verify_result": { "success": true, "exit_code": 0 }
+  },
+  "error": null,
+  "created_at": "2026-09-16T10:00:00Z",
+  "started_at": "2026-09-16T10:00:03Z",
+  "finished_at": "2026-09-16T10:02:17Z"
+}

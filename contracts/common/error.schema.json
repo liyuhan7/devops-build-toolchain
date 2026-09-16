@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/contracts/error.schema.json",
+  "title": "JobError",
+  "type": "object",
+  "required": ["code", "message"],
+  "properties": {
+    "code": { "enum": ["REQ_1001", "REQ_1002", "BASE_2001", "BASE_2002", "BASE_2003", "ENV_3002", "EXEC_4002", "ANALYSIS_5001", "REPAIR_6001"] },
+    "message": { "type": "string", "minLength": 1 },
+    "details_uri": { "type": "string" }
+  },
+  "additionalProperties": false
+}

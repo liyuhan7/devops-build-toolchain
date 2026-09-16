@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "trace_id": "trace-pair01-c0",
+  "job_type": "DOCKERFILE_GENERATION",
+  "input": {
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "0123456789abcdef0123456789abcdef01234567"
+    },
+    "build": {
+      "command": "make -j4",
+      "verify_command": "./program --version"
+    },
+    "limits": {
+      "max_iterations": 10,
+      "timeout_seconds": 1800
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/contracts/finding.schema.json",
+  "title": "Finding",
+  "type": "object",
+  "required": ["finding_id", "type", "target", "dependency", "repository_commit", "configuration_id", "detector", "evidence"],
+  "properties": {
+    "finding_id": { "type": "string", "minLength": 1 },
+    "type": { "enum": ["MISSING", "REDUNDANT"] },
+    "target": { "type": "string", "minLength": 1 },
+    "dependency": { "type": "string", "minLength": 1 },
+    "repository_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "configuration_id": { "type": "string", "minLength": 1 },
+    "detector": { "enum": ["BUILDCHECKER", "ECHECKER", "INSTRUCTOR_ORACLE"] },
+    "declaration_location": { "type": ["string", "null"] },
+    "evidence": {
+      "type": "object",
+      "required": ["artifact_uri"],
+      "properties": {
+        "actual_dependency": { "type": "boolean" },
+        "declared_dependency": { "type": "boolean" },
+        "artifact_uri": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

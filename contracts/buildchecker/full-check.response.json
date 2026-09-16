@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "job_id": "job-full-001",
+  "trace_id": "trace-pair01-c0",
+  "job_type": "FULL_CHECK",
+  "status": "SUCCEEDED",
+  "input": {},
+  "output": {
+    "actual_graph": { "artifact_id": "actual-001", "type": "ACTUAL_GRAPH", "uri": "artifact://pair01/full001/actual.json", "media_type": "application/json", "producer_job_id": "job-full-001", "repository_commit": "0123456789abcdef0123456789abcdef01234567", "configuration_id": "gcc-default" },
+    "declared_graph": { "artifact_id": "declared-001", "type": "DECLARED_GRAPH", "uri": "artifact://pair01/full001/declared.json", "media_type": "application/json", "producer_job_id": "job-full-001", "repository_commit": "0123456789abcdef0123456789abcdef01234567", "configuration_id": "gcc-default" },
+    "findings": [
+      {
+        "finding_id": "finding-001",
+        "type": "MISSING",
+        "target": "src/main.o",
+        "dependency": "include/config.h",
+        "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+        "configuration_id": "gcc-default",
+        "detector": "BUILDCHECKER",
+        "declaration_location": null,
+        "evidence": { "actual_dependency": true, "declared_dependency": false, "artifact_uri": "artifact://pair01/full001/evidence/finding-001.json" }
+      }
+    ],
+    "summary": { "missing": 1, "redundant": 0 }
+  },
+  "error": null,
+  "created_at": "2026-09-16T10:00:00Z",
+  "started_at": "2026-09-16T10:00:03Z",
+  "finished_at": "2026-09-16T10:02:17Z"
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "trace_id": "trace-pair01-c1",
+  "job_type": "REPAIR",
+  "input": {
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "89abcdef0123456789abcdef0123456789abcdef"
+    },
+    "error_report": { "artifact_uri": "artifact://pair01/inc001/md-report.json" },
+    "build_file": { "path": "Makefile" },
+    "execution": {
+      "image_uri": "docker://pair01/project:89abcde",
+      "workdir": "/workspace/project",
+      "configuration_id": "gcc-default",
+      "build_command": "make -j4",
+      "verify_command": "make test"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "trace_id": "trace-pair01-c0",
+  "job_type": "FULL_CHECK",
+  "input": {
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "0123456789abcdef0123456789abcdef01234567"
+    },
+    "execution": {
+      "image_uri": "docker://pair01/project:0123456",
+      "workdir": "/workspace/project",
+      "configuration_id": "gcc-default",
+      "clean_build_command": "make clean && make -j4",
+      "timeout_seconds": 1800
+    }
+  }
+}

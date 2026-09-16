@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "job_id": "job-repair-001",
+  "trace_id": "trace-pair01-c1",
+  "job_type": "REPAIR",
+  "status": "SUCCEEDED",
+  "input": {},
+  "output": {
+    "patch": { "artifact_id": "patch-001", "type": "GIT_PATCH", "uri": "artifact://pair01/repair001/fix.patch", "media_type": "text/x-diff", "producer_job_id": "job-repair-001", "repository_commit": "89abcdef0123456789abcdef0123456789abcdef", "configuration_id": "gcc-default" },
+    "repairs": [
+      { "finding_id": "finding-101", "target": "src/foo.o", "dependency": "include/foo.h", "declaration_style": "MACRO", "repair_strategy": "MACRO_CONVERSION", "accepted": true }
+    ],
+    "build_result": { "success": true, "exit_code": 0 },
+    "verify_result": { "success": true, "exit_code": 0 },
+    "recheck_result": { "success": true, "remaining_missing": 0 }
+  },
+  "error": null,
+  "created_at": "2026-09-16T10:10:00Z",
+  "started_at": "2026-09-16T10:10:03Z",
+  "finished_at": "2026-09-16T10:12:17Z"
+}

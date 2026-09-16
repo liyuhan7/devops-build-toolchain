@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "job_id": "job-inc-001",
+  "trace_id": "trace-pair01-c1",
+  "job_type": "INCREMENTAL_CHECK",
+  "status": "SUCCEEDED",
+  "input": {},
+  "output": {
+    "actual_graph": { "artifact_id": "actual-c1", "type": "ACTUAL_GRAPH", "uri": "artifact://pair01/inc001/actual.json", "media_type": "application/json", "producer_job_id": "job-inc-001", "repository_commit": "89abcdef0123456789abcdef0123456789abcdef", "configuration_id": "gcc-default" },
+    "findings": [
+      { "finding_id": "finding-101", "type": "MISSING", "target": "src/foo.o", "dependency": "include/foo.h", "repository_commit": "89abcdef0123456789abcdef0123456789abcdef", "configuration_id": "gcc-default", "detector": "ECHECKER", "declaration_location": null, "evidence": { "actual_dependency": true, "declared_dependency": false, "artifact_uri": "artifact://pair01/inc001/evidence/finding-101.json" } }
+    ],
+    "finding_delta": { "introduced": ["finding-101"], "resolved": ["finding-002"], "unchanged": ["finding-001"] }
+  },
+  "error": null,
+  "created_at": "2026-09-16T10:05:00Z",
+  "started_at": "2026-09-16T10:05:03Z",
+  "finished_at": "2026-09-16T10:06:17Z"
+}
