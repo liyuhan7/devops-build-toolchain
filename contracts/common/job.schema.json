@@ -2,20 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/contracts/job.schema.json",
   "title": "Job",
+  "$comment": "Job 公共字段：schema_version、job_id、trace_id、job_type、status、execution、input、output、error。时间戳统一放在 execution 内，顶层不再出现 created_at/started_at/finished_at。GET /v1/jobs/{job_id} 的响应必须满足本 Schema。job_type/status/execution 的定义以 task.schema.json 为唯一来源。",
   "type": "object",
-  "required": ["schema_version", "job_id", "trace_id", "job_type", "status", "input", "created_at"],
+  "additionalProperties": false,
+  "required": ["schema_version", "job_id", "trace_id", "job_type", "status", "execution", "input", "output", "error"],
   "properties": {
     "schema_version": { "const": "1.0" },
     "job_id": { "type": "string", "minLength": 1 },
     "trace_id": { "type": "string", "minLength": 1 },
-    "job_type": { "enum": ["DOCKERFILE_GENERATION", "FULL_CHECK", "INCREMENTAL_CHECK", "REPAIR"] },
-    "status": { "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "TIMED_OUT", "CANCELLED"] },
+    "job_type": { "$ref": "task.schema.json#/$defs/job_type" },
+    "status": { "$ref": "task.schema.json#/$defs/status" },
+    "execution": { "$ref": "task.schema.json#/$defs/execution" },
     "input": { "type": "object" },
     "output": { "type": ["object", "null"] },
-    "error": { "type": ["object", "null"] },
-    "created_at": { "type": "string", "format": "date-time" },
-    "started_at": { "type": ["string", "null"], "format": "date-time" },
-    "finished_at": { "type": ["string", "null"], "format": "date-time" }
-  },
-  "additionalProperties": false
+    "error": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "error.schema.json" }
+      ]
+    }
+  }
 }

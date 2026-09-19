@@ -2,7 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/contracts/finding.schema.json",
   "title": "Finding",
+  "$comment": "MISSING 与 REDUNDANT 是检测正常完成后得到的领域发现，写入 ERROR_REPORT 的 findings，绝不写入 job.error。根对象是一条 finding；#/$defs/report 是完整报告（含 findings 数组）。",
   "type": "object",
+  "additionalProperties": false,
   "required": ["finding_id", "type", "target", "dependency", "repository_commit", "configuration_id", "detector", "evidence"],
   "properties": {
     "finding_id": { "type": "string", "minLength": 1 },
@@ -15,14 +17,34 @@
     "declaration_location": { "type": ["string", "null"] },
     "evidence": {
       "type": "object",
+      "additionalProperties": false,
       "required": ["artifact_uri"],
       "properties": {
         "actual_dependency": { "type": "boolean" },
         "declared_dependency": { "type": "boolean" },
-        "artifact_uri": { "type": "string", "minLength": 1 }
-      },
-      "additionalProperties": false
+        "artifact_uri": { "type": "string", "pattern": "^(artifact|docker|https?)://" }
+      }
     }
   },
-  "additionalProperties": false
+  "$defs": {
+    "report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "repository", "configuration_id", "findings"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "repository": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["url", "commit"],
+          "properties": {
+            "url": { "type": "string", "pattern": "^https://" },
+            "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" }
+          }
+        },
+        "configuration_id": { "type": "string", "minLength": 1 },
+        "findings": { "type": "array", "items": { "$ref": "#" } }
+      }
+    }
+  }
 }

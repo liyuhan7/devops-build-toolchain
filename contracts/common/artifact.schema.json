@@ -2,17 +2,31 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/contracts/artifact.schema.json",
   "title": "Artifact",
+  "$comment": "Job 只保存产物元数据，大文件通过引用交接。每个引用都必须能追溯到仓库提交、执行配置与生产任务。sha256 在需要核验内容完整性时使用，故为可选字段；一旦提供必须是 64 位小写 hex。",
   "type": "object",
+  "additionalProperties": false,
   "required": ["artifact_id", "type", "uri", "media_type", "producer_job_id", "repository_commit", "configuration_id"],
   "properties": {
     "artifact_id": { "type": "string", "minLength": 1 },
-    "type": { "type": "string", "minLength": 1 },
-    "uri": { "type": "string", "minLength": 1 },
+    "type": {
+      "enum": [
+        "DOCKERFILE",
+        "CONTAINER_IMAGE",
+        "BUILD_LOG",
+        "DRAFT_ITERATION_LOG",
+        "ACTUAL_GRAPH",
+        "DECLARED_GRAPH",
+        "ERROR_REPORT",
+        "GIT_PATCH",
+        "REPAIR_REPORT",
+        "TEST_REPORT"
+      ]
+    },
+    "uri": { "type": "string", "pattern": "^(artifact|docker|https?)://" },
     "media_type": { "type": "string", "minLength": 1 },
     "producer_job_id": { "type": "string", "minLength": 1 },
     "repository_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
     "configuration_id": { "type": "string", "minLength": 1 },
     "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
-  },
-  "additionalProperties": false
+  }
 }

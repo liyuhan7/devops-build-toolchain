@@ -1,19 +1,65 @@
 {
   "schema_version": "1.0",
   "job_id": "job-inc-001",
-  "trace_id": "trace-pair01-c1",
+  "trace_id": "trace-0002",
   "job_type": "INCREMENTAL_CHECK",
   "status": "SUCCEEDED",
-  "input": {},
-  "output": {
-    "actual_graph": { "artifact_id": "actual-c1", "type": "ACTUAL_GRAPH", "uri": "artifact://pair01/inc001/actual.json", "media_type": "application/json", "producer_job_id": "job-inc-001", "repository_commit": "89abcdef0123456789abcdef0123456789abcdef", "configuration_id": "gcc-default" },
-    "findings": [
-      { "finding_id": "finding-101", "type": "MISSING", "target": "src/foo.o", "dependency": "include/foo.h", "repository_commit": "89abcdef0123456789abcdef0123456789abcdef", "configuration_id": "gcc-default", "detector": "ECHECKER", "declaration_location": null, "evidence": { "actual_dependency": true, "declared_dependency": false, "artifact_uri": "artifact://pair01/inc001/evidence/finding-101.json" } }
-    ],
-    "finding_delta": { "introduced": ["finding-101"], "resolved": ["finding-002"], "unchanged": ["finding-001"] }
+  "execution": {
+    "created_at": "2026-09-16T10:05:00Z",
+    "started_at": "2026-09-16T10:05:03Z",
+    "finished_at": "2026-09-16T10:06:17Z"
   },
-  "error": null,
-  "created_at": "2026-09-16T10:05:00Z",
-  "started_at": "2026-09-16T10:05:03Z",
-  "finished_at": "2026-09-16T10:06:17Z"
+  "input": {
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "89abcdef0123456789abcdef0123456789abcdef"
+    },
+    "baseline": {
+      "actual_graph_uri": "artifact://example/full000/actual.json",
+      "commit": "0123456789abcdef0123456789abcdef01234567",
+      "configuration_id": "gcc-default"
+    },
+    "environment": {
+      "image_uri": "docker://example/project:89abcde",
+      "workdir": "/workspace/project",
+      "configuration_id": "gcc-default",
+      "build_command": "make -j4",
+      "timeout_seconds": 1800
+    }
+  },
+  "output": {
+    "actual_graph": {
+      "artifact_id": "actual-c1",
+      "type": "ACTUAL_GRAPH",
+      "uri": "artifact://example/inc001/actual.json",
+      "media_type": "application/json",
+      "producer_job_id": "job-inc-001",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
+      "configuration_id": "gcc-default"
+    },
+    "findings": [
+      {
+        "finding_id": "finding-101",
+        "type": "MISSING",
+        "target": "src/foo.o",
+        "dependency": "include/foo.h",
+        "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
+        "configuration_id": "gcc-default",
+        "detector": "ECHECKER",
+        "declaration_location": "Makefile:24",
+        "evidence": {
+          "actual_dependency": true,
+          "declared_dependency": false,
+          "artifact_uri": "artifact://example/inc001/evidence/finding-101.json"
+        }
+      }
+    ],
+    "finding_delta": {
+      "introduced": ["finding-101"],
+      "resolved": ["finding-002"],
+      "unchanged": ["finding-001"]
+    }
+  },
+  "error": null
 }

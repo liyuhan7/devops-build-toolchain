@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "job_id": "job-draft-002",
+  "trace_id": "trace-0001",
+  "job_type": "DRAFT",
+  "status": "FAILED",
+  "execution": {
+    "created_at": "2026-09-16T10:05:00Z",
+    "started_at": "2026-09-16T10:05:01Z",
+    "finished_at": "2026-09-16T10:11:40Z"
+  },
+  "input": {
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "89abcdef0123456789abcdef0123456789abcdef"
+    },
+    "build": {
+      "command": "make -j4",
+      "verify_command": "make test"
+    },
+    "limits": {
+      "max_iterations": 3,
+      "timeout_seconds": 600
+    }
+  },
+  "output": null,
+  "error": {
+    "code": "ENV_3002",
+    "message": "基础镜像构建失败：包源不可达，已用完 3 轮迭代",
+    "details_uri": "artifact://example/draft002/env-error.log"
+  }
+}

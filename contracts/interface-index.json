@@ -1,11 +1,67 @@
 {
   "schema_version": "1.0",
   "base_path": "/v1",
+  "schemas": {
+    "task": "common/task.schema.json",
+    "job": "common/job.schema.json",
+    "artifact": "common/artifact.schema.json",
+    "finding": "common/finding.schema.json",
+    "dependency_graph": "common/dependency-graph.schema.json",
+    "error": "common/error.schema.json"
+  },
   "interfaces": [
-    { "job_type": "DOCKERFILE_GENERATION", "method": "POST", "path": "/dockerfile-jobs", "request": "draft/dockerfile-generation.request.json", "response": "draft/dockerfile-generation.response.json" },
-    { "job_type": "FULL_CHECK", "method": "POST", "path": "/full-check-jobs", "request": "buildchecker/full-check.request.json", "response": "buildchecker/full-check.response.json" },
-    { "job_type": "INCREMENTAL_CHECK", "method": "POST", "path": "/incremental-check-jobs", "request": "echecker/incremental-check.request.json", "response": "echecker/incremental-check.response.json" },
-    { "job_type": "REPAIR", "method": "POST", "path": "/repair-jobs", "request": "mdfixer/repair.request.json", "response": "mdfixer/repair.response.json" },
-    { "method": "GET", "path": "/jobs/{job_id}", "response": "common/job.schema.json" }
+    {
+      "job_type": "DRAFT",
+      "method": "POST",
+      "path": "/dockerfile-jobs",
+      "request": "draft/dockerfile-generation.request.json",
+      "response": "draft/dockerfile-generation.response.json",
+      "failure": "draft/dockerfile-generation.failed.json"
+    },
+    {
+      "job_type": "FULL_CHECK",
+      "method": "POST",
+      "path": "/full-check-jobs",
+      "request": "buildchecker/full-check.request.json",
+      "response": "buildchecker/full-check.response.json"
+    },
+    {
+      "job_type": "INCREMENTAL_CHECK",
+      "method": "POST",
+      "path": "/incremental-check-jobs",
+      "request": "echecker/incremental-check.request.json",
+      "response": "echecker/incremental-check.response.json"
+    },
+    {
+      "job_type": "REPAIR",
+      "method": "POST",
+      "path": "/repair-jobs",
+      "request": "mdfixer/repair.request.json",
+      "response": "mdfixer/repair.response.json",
+      "failure": "mdfixer/repair.rejected.json"
+    },
+    {
+      "method": "GET",
+      "path": "/jobs/{job_id}",
+      "response": "common/job.schema.json"
+    }
+  ],
+  "artifact_samples": [
+    "buildchecker/full-check.finding-report.json"
+  ],
+  "negative_samples": [
+    {
+      "path": "negative/invalid-job-type.json",
+      "reason": "job_type 不属于 DRAFT / FULL_CHECK / INCREMENTAL_CHECK / REPAIR"
+    },
+    {
+      "path": "negative/incremental-check-missing-baseline.json",
+      "reason": "INCREMENTAL_CHECK 缺少 baseline，历史图无法追溯到基线提交"
+    }
+  ],
+  "notes": [
+    "端点与字段命名一旦冻结，破坏性变更（删除、改名、改语义、改枚举）必须同步更新 Schema、样例与本索引，迁移记录写入 MIGRATION.md。",
+    "样例中的仓库地址、镜像与 artifact URI 均为占位值，只用于证明结构可交换；接入真实产物后再冻结真实基线并补齐 SHA-256。",
+    "每个 artifact 引用都必须能追溯到 producer_job_id、repository_commit 与 configuration_id。"
   ]
 }

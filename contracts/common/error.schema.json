@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.org/contracts/error.schema.json",
   "title": "JobError",
+  "$comment": "写入 job.error 的系统错误码：ENV_3002 镜像构建失败、EXEC_4002 任务超时、ANALYSIS_5001 分析器失败、REQ_1001/REQ_1002 请求非法、BASE_2001/BASE_2002/BASE_2003 基线或提交不匹配、REPAIR_6001 修复输入非法。领域发现（MISSING/REDUNDANT）不是错误，见 finding.schema.json。",
   "type": "object",
   "required": ["code", "message"],
   "properties": {

@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "repository": {
+    "url": "https://github.com/example/project.git",
+    "commit": "89abcdef0123456789abcdef0123456789abcdef"
+  },
+  "configuration_id": "gcc-default",
+  "findings": [
+    {
+      "finding_id": "finding-001",
+      "type": "MISSING",
+      "target": "src/main.o",
+      "dependency": "include/config.h",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
+      "configuration_id": "gcc-default",
+      "detector": "BUILDCHECKER",
+      "declaration_location": "Makefile:12",
+      "evidence": {
+        "actual_dependency": true,
+        "declared_dependency": false,
+        "artifact_uri": "artifact://example/full001/evidence/finding-001.json"
+      }
+    }
+  ]
+}

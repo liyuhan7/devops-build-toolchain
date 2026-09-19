@@ -1,20 +1,20 @@
 {
   "schema_version": "1.0",
-  "trace_id": "trace-pair01-c1",
+  "trace_id": "trace-0002",
   "job_type": "INCREMENTAL_CHECK",
   "input": {
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
     "repository": {
       "url": "https://github.com/example/project.git",
       "commit": "89abcdef0123456789abcdef0123456789abcdef"
     },
-    "base_commit": "0123456789abcdef0123456789abcdef01234567",
     "baseline": {
-      "actual_graph_uri": "artifact://pair01/full001/actual.json",
+      "actual_graph_uri": "artifact://example/full000/actual.json",
       "commit": "0123456789abcdef0123456789abcdef01234567",
       "configuration_id": "gcc-default"
     },
-    "execution": {
-      "image_uri": "docker://pair01/project:89abcde",
+    "environment": {
+      "image_uri": "docker://example/project:89abcde",
       "workdir": "/workspace/project",
       "configuration_id": "gcc-default",
       "build_command": "make -j4",

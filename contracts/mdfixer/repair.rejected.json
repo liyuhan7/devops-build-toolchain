@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "job_id": "job-repair-001",
+  "job_id": "job-repair-002",
   "trace_id": "trace-0002",
   "job_type": "REPAIR",
   "status": "SUCCEEDED",
   "execution": {
-    "created_at": "2026-09-16T10:10:00Z",
-    "started_at": "2026-09-16T10:10:03Z",
-    "finished_at": "2026-09-16T10:12:17Z"
+    "created_at": "2026-09-16T10:15:00Z",
+    "started_at": "2026-09-16T10:15:02Z",
+    "finished_at": "2026-09-16T10:18:44Z"
   },
   "input": {
     "repository": {
@@ -30,31 +30,20 @@
     }
   },
   "output": {
-    "accepted": true,
-    "declaration_style": "沿用 Makefile 现有的显式头文件依赖写法",
-    "patch": {
-      "artifact_id": "patch-001",
-      "type": "GIT_PATCH",
-      "uri": "artifact://example/repair001/fix.patch",
-      "media_type": "text/x-diff",
-      "producer_job_id": "job-repair-001",
-      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
-      "configuration_id": "gcc-default"
-    },
-    "repairs": [
+    "accepted": false,
+    "repairs": [],
+    "rejected_candidates": [
       {
-        "finding_id": "finding-101",
-        "target": "src/foo.o",
-        "dependency": "include/foo.h",
-        "declaration_style": "MAKE_EXPLICIT_DEPENDENCY",
-        "repair_strategy": "ADD_HEADER_DEPENDENCY",
-        "accepted": true
+        "candidate": "在 Makefile 中为 src/main.o 追加 -include include/config.h",
+        "stage": "recheck",
+        "exit_code": 0,
+        "log_uri": "artifact://example/repair002/recheck.log",
+        "reason": "干净构建与测试均通过，但重检仍报告 finding-001 为 MISSING，说明该写法没有真正补上声明依赖"
       }
     ],
-    "rejected_candidates": [],
     "build_result": { "success": true, "exit_code": 0 },
     "verify_result": { "success": true, "exit_code": 0 },
-    "recheck_result": { "success": true, "remaining_missing": 0 }
+    "recheck_result": { "success": false, "remaining_missing": 1 }
   },
   "error": null
 }

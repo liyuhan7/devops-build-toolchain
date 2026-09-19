@@ -1,44 +1,76 @@
 {
   "schema_version": "1.0",
   "job_id": "job-draft-001",
-  "trace_id": "trace-pair01-c0",
-  "job_type": "DOCKERFILE_GENERATION",
+  "trace_id": "trace-0001",
+  "job_type": "DRAFT",
   "status": "SUCCEEDED",
-  "input": {},
+  "execution": {
+    "created_at": "2026-09-16T10:00:00Z",
+    "started_at": "2026-09-16T10:00:03Z",
+    "finished_at": "2026-09-16T10:02:17Z"
+  },
+  "input": {
+    "repository": {
+      "url": "https://github.com/example/project.git",
+      "commit": "89abcdef0123456789abcdef0123456789abcdef"
+    },
+    "build": {
+      "command": "make -j4",
+      "verify_command": "make test"
+    },
+    "limits": {
+      "max_iterations": 10,
+      "timeout_seconds": 1800
+    }
+  },
   "output": {
     "dockerfile": {
       "artifact_id": "dockerfile-001",
       "type": "DOCKERFILE",
-      "uri": "artifact://pair01/draft001/Dockerfile",
+      "uri": "artifact://example/draft001/Dockerfile",
       "media_type": "text/plain",
       "producer_job_id": "job-draft-001",
-      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
       "configuration_id": "gcc-default"
     },
     "image": {
       "artifact_id": "image-001",
       "type": "CONTAINER_IMAGE",
-      "uri": "docker://pair01/project:0123456",
+      "uri": "docker://example/project:89abcde",
       "media_type": "application/vnd.oci.image.manifest.v1+json",
       "producer_job_id": "job-draft-001",
-      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
       "configuration_id": "gcc-default"
     },
-    "iterations": 4,
+    "iterations": [
+      {
+        "iteration": 1,
+        "command": "make -j4",
+        "exit_code": 2,
+        "log_uri": "artifact://example/draft001/iter-01.log",
+        "change": "基础镜像补充 build-essential 与 make",
+        "reason": "第一次构建在日志中报 cc 未找到，说明镜像缺少编译器"
+      },
+      {
+        "iteration": 2,
+        "command": "make -j4",
+        "exit_code": 0,
+        "log_uri": "artifact://example/draft001/iter-02.log",
+        "change": "固定镜像基础版本并写入 verify_command",
+        "reason": "干净构建与 make test 均通过，需要固化成可重复的环境"
+      }
+    ],
     "iteration_log": {
       "artifact_id": "draft-log-001",
       "type": "DRAFT_ITERATION_LOG",
-      "uri": "artifact://pair01/draft001/iterations.json",
+      "uri": "artifact://example/draft001/iterations.json",
       "media_type": "application/json",
       "producer_job_id": "job-draft-001",
-      "repository_commit": "0123456789abcdef0123456789abcdef01234567",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
       "configuration_id": "gcc-default"
     },
     "build_result": { "success": true, "exit_code": 0 },
     "verify_result": { "success": true, "exit_code": 0 }
   },
-  "error": null,
-  "created_at": "2026-09-16T10:00:00Z",
-  "started_at": "2026-09-16T10:00:03Z",
-  "finished_at": "2026-09-16T10:02:17Z"
+  "error": null
 }

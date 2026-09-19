@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "trace_id": "trace-pair01-c0",
-  "job_type": "DOCKERFILE_GENERATION",
+  "trace_id": "trace-0001",
+  "job_type": "DRAFT",
   "input": {
     "repository": {
       "url": "https://github.com/example/project.git",
-      "commit": "0123456789abcdef0123456789abcdef01234567"
+      "commit": "89abcdef0123456789abcdef0123456789abcdef"
     },
     "build": {
       "command": "make -j4",
-      "verify_command": "./program --version"
+      "verify_command": "make test"
     },
     "limits": {
       "max_iterations": 10,

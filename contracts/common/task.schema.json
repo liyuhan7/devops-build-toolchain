@@ -1,0 +1,307 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/contracts/task.schema.json",
+  "title": "Unified Task Model",
+  "$comment": "统一任务模型：本文件是 job_type、status、错误码、execution 以及四类任务输入输出的唯一来源；job.schema.json、artifact.schema.json、error.schema.json、finding.schema.json 通过相对 $ref 复用，不在别处复制枚举。四类任务各自的 input 由 if/then 强制约束，未声明的字段一律拒绝。",
+  "$defs": {
+    "job_type": {
+      "enum": ["DRAFT", "FULL_CHECK", "INCREMENTAL_CHECK", "REPAIR"]
+    },
+    "status": {
+      "enum": ["QUEUED", "RUNNING", "SUCCEEDED", "FAILED", "TIMED_OUT", "CANCELLED"]
+    },
+    "terminal_status": {
+      "enum": ["SUCCEEDED", "FAILED", "TIMED_OUT", "CANCELLED"]
+    },
+    "sha40": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "artifact_uri": {
+      "type": "string",
+      "pattern": "^(artifact|docker|https?)://"
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["created_at", "started_at", "finished_at"],
+      "properties": {
+        "created_at": { "type": "string", "format": "date-time" },
+        "started_at": { "type": ["string", "null"], "format": "date-time" },
+        "finished_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["url", "commit"],
+      "properties": {
+        "url": { "type": "string", "pattern": "^https://" },
+        "commit": { "$ref": "#/$defs/sha40" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["image_uri", "configuration_id"],
+      "properties": {
+        "image_uri": { "$ref": "#/$defs/artifact_uri" },
+        "workdir": { "type": "string", "minLength": 1 },
+        "configuration_id": { "type": "string", "minLength": 1 },
+        "clean_build_command": { "type": "string", "minLength": 1 },
+        "build_command": { "type": "string", "minLength": 1 },
+        "verify_command": { "type": "string", "minLength": 1 },
+        "timeout_seconds": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actual_graph_uri", "commit", "configuration_id"],
+      "properties": {
+        "actual_graph_uri": { "$ref": "#/$defs/artifact_uri" },
+        "commit": { "$ref": "#/$defs/sha40" },
+        "configuration_id": { "type": "string", "minLength": 1 }
+      }
+    },
+    "error_report_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "media_type", "repository_commit", "configuration_id"],
+      "properties": {
+        "uri": { "$ref": "#/$defs/artifact_uri" },
+        "media_type": { "type": "string", "minLength": 1 },
+        "repository_commit": { "$ref": "#/$defs/sha40" },
+        "configuration_id": { "type": "string", "minLength": 1 },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "build_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["success", "exit_code"],
+      "properties": {
+        "success": { "type": "boolean" },
+        "exit_code": { "type": "integer" }
+      }
+    },
+    "artifact_ref": { "$ref": "artifact.schema.json" },
+    "finding": { "$ref": "finding.schema.json" },
+    "finding_report": { "$ref": "finding.schema.json#/$defs/report" },
+
+    "draft_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "build", "limits"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repository" },
+        "build": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["command", "verify_command"],
+          "properties": {
+            "command": { "type": "string", "minLength": 1 },
+            "verify_command": { "type": "string", "minLength": 1 }
+          }
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max_iterations", "timeout_seconds"],
+          "properties": {
+            "max_iterations": { "type": "integer", "minimum": 1 },
+            "timeout_seconds": { "type": "integer", "minimum": 1 }
+          }
+        }
+      }
+    },
+    "full_check_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "environment"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repository" },
+        "environment": { "$ref": "#/$defs/environment" }
+      },
+      "allOf": [
+        { "properties": { "environment": { "required": ["clean_build_command"] } } }
+      ]
+    },
+    "incremental_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "environment", "base_commit", "baseline"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repository" },
+        "environment": { "$ref": "#/$defs/environment" },
+        "base_commit": { "$ref": "#/$defs/sha40" },
+        "baseline": { "$ref": "#/$defs/baseline" }
+      },
+      "allOf": [
+        { "properties": { "environment": { "required": ["build_command"] } } }
+      ]
+    },
+    "repair_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "error_report", "environment"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/repository" },
+        "error_report": { "$ref": "#/$defs/error_report_ref" },
+        "environment": { "$ref": "#/$defs/environment" }
+      },
+      "allOf": [
+        { "properties": { "environment": { "required": ["build_command", "verify_command"] } } }
+      ]
+    },
+
+    "draft_iteration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iteration", "command", "exit_code", "log_uri", "change", "reason"],
+      "properties": {
+        "iteration": { "type": "integer", "minimum": 1 },
+        "command": { "type": "string", "minLength": 1 },
+        "exit_code": { "type": "integer" },
+        "log_uri": { "$ref": "#/$defs/artifact_uri" },
+        "change": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "draft_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dockerfile", "image", "iterations", "iteration_log", "build_result", "verify_result"],
+      "properties": {
+        "dockerfile": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "DOCKERFILE" } } }] },
+        "image": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "CONTAINER_IMAGE" } } }] },
+        "iterations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/draft_iteration" } },
+        "iteration_log": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "DRAFT_ITERATION_LOG" } } }] },
+        "build_result": { "$ref": "#/$defs/build_result" },
+        "verify_result": { "$ref": "#/$defs/build_result" }
+      }
+    },
+    "full_check_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actual_graph", "declared_graph", "finding_report", "findings", "summary"],
+      "properties": {
+        "actual_graph": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "ACTUAL_GRAPH" } } }] },
+        "declared_graph": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "DECLARED_GRAPH" } } }] },
+        "finding_report": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "ERROR_REPORT" } } }] },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+        "summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["missing", "redundant"],
+          "properties": {
+            "missing": { "type": "integer", "minimum": 0 },
+            "redundant": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "incremental_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actual_graph", "findings", "finding_delta"],
+      "properties": {
+        "actual_graph": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "ACTUAL_GRAPH" } } }] },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+        "finding_delta": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["introduced", "resolved", "unchanged"],
+          "properties": {
+            "introduced": { "type": "array", "items": { "type": "string" } },
+            "resolved": { "type": "array", "items": { "type": "string" } },
+            "unchanged": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      }
+    },
+    "repair_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "target", "dependency", "declaration_style", "repair_strategy", "accepted"],
+      "properties": {
+        "finding_id": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 },
+        "dependency": { "type": "string", "minLength": 1 },
+        "declaration_style": { "type": "string", "minLength": 1 },
+        "repair_strategy": { "type": "string", "minLength": 1 },
+        "accepted": { "type": "boolean" }
+      }
+    },
+    "rejected_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate", "stage", "exit_code", "log_uri", "reason"],
+      "properties": {
+        "candidate": { "type": "string", "minLength": 1 },
+        "stage": { "enum": ["apply", "build", "test", "recheck"] },
+        "exit_code": { "type": "integer" },
+        "log_uri": { "$ref": "#/$defs/artifact_uri" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "repair_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accepted", "repairs", "rejected_candidates", "build_result", "verify_result", "recheck_result"],
+      "properties": {
+        "accepted": { "type": "boolean" },
+        "declaration_style": { "type": "string", "minLength": 1 },
+        "patch": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "GIT_PATCH" } } }] },
+        "repairs": { "type": "array", "items": { "$ref": "#/$defs/repair_entry" } },
+        "rejected_candidates": { "type": "array", "items": { "$ref": "#/$defs/rejected_candidate" } },
+        "build_result": { "$ref": "#/$defs/build_result" },
+        "verify_result": { "$ref": "#/$defs/build_result" },
+        "recheck_result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["success", "remaining_missing"],
+          "properties": {
+            "success": { "type": "boolean" },
+            "remaining_missing": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "trace_id", "job_type", "input"],
+      "properties": {
+        "schema_version": { "const": "1.0" },
+        "trace_id": { "type": "string", "minLength": 1 },
+        "job_type": { "$ref": "#/$defs/job_type" },
+        "input": { "type": "object" }
+      },
+      "allOf": [
+        { "if": { "properties": { "job_type": { "const": "DRAFT" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/draft_input" } } } },
+        { "if": { "properties": { "job_type": { "const": "FULL_CHECK" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/full_check_input" } } } },
+        { "if": { "properties": { "job_type": { "const": "INCREMENTAL_CHECK" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/incremental_input" } } } },
+        { "if": { "properties": { "job_type": { "const": "REPAIR" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/repair_input" } } } }
+      ]
+    },
+    "response": {
+      "allOf": [
+        { "$ref": "job.schema.json" },
+        { "if": { "properties": { "job_type": { "const": "DRAFT" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/draft_input" }, "output": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/draft_output" }] } } } },
+        { "if": { "properties": { "job_type": { "const": "FULL_CHECK" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/full_check_input" }, "output": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/full_check_output" }] } } } },
+        { "if": { "properties": { "job_type": { "const": "INCREMENTAL_CHECK" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/incremental_input" }, "output": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/incremental_output" }] } } } },
+        { "if": { "properties": { "job_type": { "const": "REPAIR" } } }, "then": { "properties": { "input": { "$ref": "#/$defs/repair_input" }, "output": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/repair_output" }] } } } }
+      ]
+    }
+  },
+  "anyOf": [
+    { "$ref": "#/$defs/request" },
+    { "$ref": "#/$defs/response" }
+  ]
+}
