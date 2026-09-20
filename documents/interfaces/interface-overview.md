@@ -40,3 +40,10 @@ python scripts/validate.py
 ```
 
 脚本真实加载 `contracts/common/*.schema.json` 并叠加跨字段语义断言，同时用变异用例自检校验器本身。
+
+## 设计决策与产物读取
+
+- [ADR 索引](../adr/README.md)：决策背景、替代方案、代价和实现差距。
+- [产物读取约定](artifact-model.md)：共享目录/离线包、URI 映射、manifest、基线校验和错误处理。
+
+新增读取协议尚待配对组确认，仓库当前没有产物解析器或下载服务。

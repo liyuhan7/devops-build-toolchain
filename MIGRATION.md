@@ -50,3 +50,9 @@ python scripts/validate.py
 ```
 
 校验器直接加载 `contracts/common/*.schema.json`，因此上表的命名与必填变化都会在样例上体现为硬失败。
+
+## 六、2026-09-20 读取协议补充（待配对确认）
+
+新增 ADR-001 至 ADR-004，并将产物读取方案落实为共享目录或离线包及独立 manifest。现有 Job/Artifact Schema 和 schema_version=1.0 不变。真实文件交接要求 SHA-256，纯结构样例仍可省略。历史图与 base_commit 对齐，失败任务日志可用于诊断；镜像 digest 不作为文件 sha256。
+
+这是文档与语义约定更新，解析器、manifest Schema 和服务行为尚未实现。详情见 documents/interfaces/artifact-model.md。

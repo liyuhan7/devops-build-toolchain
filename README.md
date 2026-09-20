@@ -13,10 +13,12 @@
 - `INCREMENTAL_CHECK`
 - `REPAIR`
 
-接口采用统一异步 Job 模型：`POST` 立即返回 `202` 与 `QUEUED`，`GET /v1/jobs/{job_id}` 查询状态与产物引用；Dockerfile、镜像、日志、依赖图、错误报告与 Patch 都通过 `artifact://` 引用交接。
+接口采用统一异步 Job 模型：`POST` 立即返回 `202` 与 `QUEUED`，`GET /v1/jobs/{job_id}` 查询状态与产物引用；Dockerfile、镜像、日志、依赖图、错误报告与 Patch 以产物引用交接，文件使用 `artifact://`，镜像使用 `docker://`。
 
 ## 仓库入口
 
+- [架构决策记录](documents/adr/README.md)
+- [产物读取约定](documents/interfaces/artifact-model.md)
 - [接口设计说明](documents/interfaces/interface-overview.md)
 - [JSON 接口索引](contracts/interface-index.json)
 - [统一任务模型](contracts/common/task.schema.json)：`job_type`、`status`、错误码与四类任务输入输出的唯一来源

@@ -8,4 +8,6 @@
 - `../contracts/interface-index.json`：四类接口的 JSON 索引。
 - `../MIGRATION.md`：字段命名与结构的迁移说明。
 
-`requirements/`、`architecture/`、`adr/` 和 `experiments/` 为预留目录。
+- [ADR 索引](adr/README.md)：异步 Job、产物交接、基线与修复验证、版本兼容性决策。
+
+`requirements/`、`architecture/` 和 `experiments/` 为预留目录。
