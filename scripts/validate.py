@@ -234,6 +234,9 @@ def semantic_errors(job):
         if baseline.get("commit") != payload.get("base_commit"):
             errors.append("baseline.commit 必须等于 base_commit（历史图必须能追溯到基线提交）")
 
+        if baseline.get("configuration_id") != (payload.get("environment") or {}).get("configuration_id"):
+            errors.append("baseline.configuration_id 必须等于 environment.configuration_id")
+
     if job_type == "REPAIR":
         report = payload.get("error_report") or {}
         repository = payload.get("repository") or {}
@@ -266,6 +269,10 @@ def semantic_errors(job):
 
     if job_type == "REPAIR" and status == "SUCCEEDED":
         if output.get("accepted") is True:
+            for key in ("build_result", "verify_result"):
+                result = output.get(key) or {}
+                if result.get("success") is not True or result.get("exit_code") != 0:
+                    errors.append("MDFixer：%s 未通过却接受补丁" % key)
             recheck = output.get("recheck_result") or {}
             if recheck.get("success") is not True or recheck.get("remaining_missing") != 0:
                 errors.append("MDFixer：重检未清零却接受补丁")
@@ -279,6 +286,63 @@ def semantic_errors(job):
                 if not candidate.get("reason"):
                     errors.append("MDFixer：第 %d 个被拒候选缺少原因" % (index + 1))
 
+    return errors
+
+
+def handoff_errors(producer, report, consumer):
+    """校验已读取的报告和生产/消费对象；不负责下载 artifact URI。"""
+    errors = check(producer, "task.schema.json", "/$defs/response")
+    errors += check(report, "finding.schema.json", "/$defs/report")
+    pointer = "/$defs/response" if "status" in consumer else "/$defs/request"
+    errors += check(consumer, "task.schema.json", pointer)
+    if errors:
+        return errors
+    errors += semantic_errors(producer) + semantic_errors(consumer)
+    if producer["job_type"] not in {"FULL_CHECK", "INCREMENTAL_CHECK"} or producer["status"] != "SUCCEEDED":
+        return errors + ["报告必须来自成功完成的检测任务"]
+    if consumer["job_type"] != "REPAIR":
+        return errors + ["报告消费者必须为 REPAIR"]
+    output = producer.get("output") or {}
+    artifact = output.get("finding_report")
+    if not artifact:
+        return errors + ["生产者缺少 finding_report"]
+    payload = consumer["input"]
+    reference = payload["error_report"]
+    repository = payload["repository"]
+    configuration = payload["environment"]["configuration_id"]
+    if producer["input"]["repository"] != repository or report["repository"] != repository:
+        errors.append("报告、生产任务与消费任务的仓库及提交必须一致")
+    if artifact["producer_job_id"] != producer["job_id"]:
+        errors.append("报告生产任务不匹配")
+    for key in ("uri", "media_type", "repository_commit", "configuration_id"):
+        if reference[key] != artifact[key]:
+            errors.append("报告引用 %s 与生产者不一致" % key)
+    if artifact["media_type"] != "application/json":
+        errors.append("错误报告必须是 application/json")
+    if artifact["repository_commit"] != repository["commit"]:
+        errors.append("报告产物提交不匹配")
+    if any(value != configuration for value in (
+        artifact["configuration_id"], report["configuration_id"],
+        producer["input"]["environment"]["configuration_id"],
+    )):
+        errors.append("报告和生产/消费配置必须一致")
+    if report["findings"] != output["findings"]:
+        errors.append("报告内容与生产者 findings 不一致")
+    findings = {}
+    for finding in report["findings"]:
+        identity = finding["finding_id"]
+        if identity in findings:
+            errors.append("报告 finding_id 重复")
+        findings[identity] = finding
+        if finding["type"] != "MISSING":
+            errors.append("MDFixer 仅消费 MISSING")
+        if finding["repository_commit"] != repository["commit"] or finding["configuration_id"] != configuration:
+            errors.append("finding 的提交或配置不匹配")
+    repairs = (consumer.get("output") or {}).get("repairs", [])
+    for repair in repairs:
+        finding = findings.get(repair["finding_id"])
+        if not finding or any(repair[key] != finding[key] for key in ("target", "dependency")):
+            errors.append("修复条目必须对应输入报告的 finding_id、target 和 dependency")
     return errors
 
 
@@ -548,6 +612,67 @@ def main():
         assert "QUEUED" in error_codes and "CANCELLED" in error_codes
 
     tests.append(("枚举唯一来源：job.schema.json 复用 task.schema.json 的定义", enums_shared))
+
+    def incremental_configuration_regression():
+        for relative, pointer in ((requests["INCREMENTAL_CHECK"], "/$defs/request"),
+                                  (responses["INCREMENTAL_CHECK"], "/$defs/response")):
+            job = load_sample(relative)
+            assert not semantic_errors(job)
+            assert job["input"]["base_commit"] != job["input"]["repository"]["commit"]
+            broken = mutate(job, lambda x: x["input"]["baseline"].update(configuration_id="different"))
+            assert not check(broken, "task.schema.json", pointer)
+            assert any("baseline.configuration_id" in e for e in semantic_errors(broken))
+
+    tests.append(("回归：增量请求和响应拒绝配置漂移，允许新旧提交不同", incremental_configuration_regression))
+
+    def repair_acceptance_regression():
+        job = load_sample(responses["REPAIR"])
+        assert not semantic_errors(job)
+        for key in ("build_result", "verify_result"):
+            for result in ({"success": False, "exit_code": 1},
+                           {"success": False, "exit_code": 0},
+                           {"success": True, "exit_code": 1}):
+                broken = mutate(job, lambda x: x["output"].update({key: result}))
+                assert not check(broken, "task.schema.json", "/$defs/response")
+                assert any(key in e for e in semantic_errors(broken)), (key, result)
+        rejected = load_sample("mdfixer/repair.rejected.json")
+        assert not semantic_errors(rejected), "合法拒绝候选结果应保持有效"
+
+    tests.append(("回归：接受补丁要求构建和验证的成功标志及退出码均通过", repair_acceptance_regression))
+
+    def report_handoffs():
+        for entry in index["report_handoffs"]:
+            producer = load_sample(entry["producer_response"])
+            report = load_sample(entry["report"])
+            request = load_sample(entry["consumer_request"])
+            response = load_sample(entry["consumer_response"])
+            assert request["input"] == response["input"], "修复请求与响应输入不一致"
+            assert not handoff_errors(producer, report, request)
+            assert not handoff_errors(producer, report, response)
+            for key in ("finding_id", "target", "dependency"):
+                broken = mutate(response, lambda x: x["output"]["repairs"][0].update({key: "wrong"}))
+                assert any("修复条目" in e for e in handoff_errors(producer, report, broken))
+            wrong_uri = mutate(request, lambda x: x["input"]["error_report"].update(uri="artifact://wrong/report.json"))
+            assert any("引用 uri" in e for e in handoff_errors(producer, report, wrong_uri))
+            wrong_report = mutate(report, lambda x: x["findings"][0].update(target="wrong"))
+            assert any("报告内容" in e for e in handoff_errors(producer, wrong_report, response))
+            rd_report = mutate(report, lambda x: x["findings"][0].update(type="REDUNDANT"))
+            assert any("仅消费 MISSING" in e for e in handoff_errors(producer, rd_report, request))
+            wrong_config = mutate(report, lambda x: x.update(configuration_id="wrong"))
+            assert any("配置" in e for e in handoff_errors(producer, wrong_config, request))
+
+    tests.append(("回归：全量及增量报告与修复请求/响应一致，错配内容被拒绝", report_handoffs))
+
+    def incremental_report_required():
+        job = load_sample(responses["INCREMENTAL_CHECK"])
+        for change in (lambda x: x["output"].pop("finding_report"),
+                       lambda x: x["output"]["finding_report"].update(type="ACTUAL_GRAPH")):
+            assert check(mutate(job, change), "task.schema.json", "/$defs/response")
+        reference = job["output"]["finding_report"]
+        assert reference["producer_job_id"] == job["job_id"]
+        assert reference["repository_commit"] == job["input"]["repository"]["commit"]
+
+    tests.append(("回归：增量输出必须提供 ERROR_REPORT 引用", incremental_report_required))
 
     verbosity = "--all" in sys.argv
     passed = 0

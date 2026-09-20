@@ -56,9 +56,22 @@
       }
     ],
     "finding_delta": {
-      "introduced": ["finding-101"],
-      "resolved": ["finding-002"],
-      "unchanged": ["finding-001"]
+      "introduced": [
+        "finding-101"
+      ],
+      "resolved": [
+        "finding-002"
+      ],
+      "unchanged": []
+    },
+    "finding_report": {
+      "artifact_id": "report-inc-001",
+      "type": "ERROR_REPORT",
+      "uri": "artifact://example/inc001/md-report.json",
+      "media_type": "application/json",
+      "producer_job_id": "job-inc-001",
+      "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
+      "configuration_id": "gcc-default"
     }
   },
   "error": null

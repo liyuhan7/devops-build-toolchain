@@ -35,6 +35,6 @@
 python scripts/validate.py
 ```
 
-脚本仅用 Python 标准库，会用最小的 JSON Schema 子集解释器**真实加载** `contracts/common/*.schema.json`，再叠加 Schema 表达不了的语义断言（`baseline.commit == base_commit`、错误报告的提交与配置一致性、终态规则、构建与重检的成功语义、artifact 的生产任务与提交一致性等），并用变异用例自检校验器本身。当前结果：`17 passed, 0 failed`。
+脚本仅用 Python 标准库，会用最小的 JSON Schema 子集解释器**真实加载** `contracts/common/*.schema.json`，再叠加 Schema 表达不了的语义断言（`baseline.commit == base_commit`、错误报告的提交与配置一致性、终态规则、构建与重检的成功语义、artifact 的生产任务与提交一致性等），并用变异用例自检校验器本身。当前结果：`21 passed, 0 failed`。
 
 样例中的仓库地址、镜像与 artifact URI 均为占位值，只用于证明结构可交换；接入真实产物后再冻结真实基线并补齐 SHA-256。

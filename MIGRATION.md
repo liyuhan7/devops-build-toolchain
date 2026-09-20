@@ -56,3 +56,11 @@ python scripts/validate.py
 新增 ADR-001 至 ADR-004，并将产物读取方案落实为共享目录或离线包及独立 manifest。现有 Job/Artifact Schema 和 schema_version=1.0 不变。真实文件交接要求 SHA-256，纯结构样例仍可省略。历史图与 base_commit 对齐，失败任务日志可用于诊断；镜像 digest 不作为文件 sha256。
 
 这是文档与语义约定更新，解析器、manifest Schema 和服务行为尚未实现。详情见 documents/interfaces/artifact-model.md。
+
+## 七、E2 契约问题修复
+
+- INCREMENTAL_CHECK 的非空 output 新增必填 finding_report，类型为 ERROR_REPORT，并提供完整报告样例。旧增量响应缺少此字段会被拒绝；旧的严格 Schema 也无法接受新字段，因此这是破坏性草案变更。
+- 当前 1.0 尚未配对冻结，本次同步修订草案及全部相关样例，未声明与旧快照兼容。已基于旧快照开发的消费者必须同步更新；若已在仓库外冻结，应在正式交付前按 ADR-004 分配新主版本。
+- 原全量修复响应改为处理输入报告中的 finding-001；新增 repair-from-incremental 样例处理增量报告中的 finding-101。
+- 校验新增增量配置一致性、补丁接受时构建/验证成功及报告交接检查。interface-index.json 新增 report_handoffs，用于本地样例关联，不是运行时下载映射。
+- 增量样例清除未在当前 findings 中出现的 unchanged 项。

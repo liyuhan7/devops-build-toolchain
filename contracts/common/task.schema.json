@@ -208,9 +208,10 @@
     "incremental_output": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["actual_graph", "findings", "finding_delta"],
+      "required": ["actual_graph", "finding_report", "findings", "finding_delta"],
       "properties": {
         "actual_graph": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "ACTUAL_GRAPH" } } }] },
+        "finding_report": { "allOf": [{ "$ref": "#/$defs/artifact_ref" }, { "properties": { "type": { "const": "ERROR_REPORT" } } }] },
         "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
         "finding_delta": {
           "type": "object",

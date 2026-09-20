@@ -47,7 +47,8 @@
     }
   ],
   "artifact_samples": [
-    "buildchecker/full-check.finding-report.json"
+    "buildchecker/full-check.finding-report.json",
+    "echecker/incremental-check.finding-report.json"
   ],
   "negative_samples": [
     {
@@ -63,5 +64,19 @@
     "端点与字段命名一旦冻结，破坏性变更（删除、改名、改语义、改枚举）必须同步更新 Schema、样例与本索引，迁移记录写入 MIGRATION.md。",
     "样例中的仓库地址、镜像与 artifact URI 均为占位值，只用于证明结构可交换；接入真实产物后再冻结真实基线并补齐 SHA-256。",
     "每个 artifact 引用都必须能追溯到 producer_job_id、repository_commit 与 configuration_id。"
+  ],
+  "report_handoffs": [
+    {
+      "producer_response": "buildchecker/full-check.response.json",
+      "report": "buildchecker/full-check.finding-report.json",
+      "consumer_request": "mdfixer/repair.request.json",
+      "consumer_response": "mdfixer/repair.response.json"
+    },
+    {
+      "producer_response": "echecker/incremental-check.response.json",
+      "report": "echecker/incremental-check.finding-report.json",
+      "consumer_request": "mdfixer/repair-from-incremental.request.json",
+      "consumer_response": "mdfixer/repair-from-incremental.response.json"
+    }
   ]
 }

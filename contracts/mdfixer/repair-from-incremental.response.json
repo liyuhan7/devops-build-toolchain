@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "job_id": "job-repair-001",
+  "job_id": "job-repair-inc-001",
   "trace_id": "trace-0002",
   "job_type": "REPAIR",
   "status": "SUCCEEDED",
@@ -15,7 +15,7 @@
       "commit": "89abcdef0123456789abcdef0123456789abcdef"
     },
     "error_report": {
-      "uri": "artifact://example/full001/md-report.json",
+      "uri": "artifact://example/inc001/md-report.json",
       "media_type": "application/json",
       "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
       "configuration_id": "gcc-default"
@@ -33,19 +33,19 @@
     "accepted": true,
     "declaration_style": "沿用 Makefile 现有的显式头文件依赖写法",
     "patch": {
-      "artifact_id": "patch-001",
+      "artifact_id": "patch-inc-001",
       "type": "GIT_PATCH",
-      "uri": "artifact://example/repair001/fix.patch",
+      "uri": "artifact://example/repair-inc001/fix.patch",
       "media_type": "text/x-diff",
-      "producer_job_id": "job-repair-001",
+      "producer_job_id": "job-repair-inc-001",
       "repository_commit": "89abcdef0123456789abcdef0123456789abcdef",
       "configuration_id": "gcc-default"
     },
     "repairs": [
       {
-        "finding_id": "finding-001",
-        "target": "src/main.o",
-        "dependency": "include/config.h",
+        "finding_id": "finding-101",
+        "target": "src/foo.o",
+        "dependency": "include/foo.h",
         "declaration_style": "MAKE_EXPLICIT_DEPENDENCY",
         "repair_strategy": "ADD_HEADER_DEPENDENCY",
         "accepted": true

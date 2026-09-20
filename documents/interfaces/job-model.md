@@ -34,7 +34,7 @@ Job 公共字段为 `schema_version`、`job_id`、`trace_id`、`job_type`、`sta
 - `FAILED` / `TIMED_OUT` 必须给出 `error.code`。
 - 检测到 `MISSING` / `REDUNDANT` 不是失败：任务仍为 `SUCCEEDED`，发现写入 `ERROR_REPORT` 的 `findings`。
 - DRAFT 只有在干净构建与验证都通过、且逐轮迭代都记录了修改内容和理由时才能标记 `SUCCEEDED`。
-- MDFixer 只有在重检不再报告 MISSING 时才能接受补丁；没有可接受候选时任务正常完成，但 `accepted` 为 `false` 且必须逐条记录被拒原因。
+- MDFixer 只有在构建和验证均 success=true、exit_code=0，且重检成功并不再报告 MISSING 时才能接受补丁；没有可接受候选时任务正常完成，但 `accepted` 为 `false` 且必须逐条记录被拒原因。
 
 ## 错误
 

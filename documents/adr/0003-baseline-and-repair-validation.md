@@ -30,6 +30,6 @@
 
 ## Validation 与实现差距
 
-现有校验已检查 baseline/base_commit、修复报告提交和配置、重检清零及 Patch 引用。待补：增量配置一致性、接受补丁时构建与测试成功、报告内容和修复条目对应、实际文件与仓库身份检查。
+现有校验已检查 baseline/base_commit、增量配置一致性、修复报告提交和配置、接受补丁时构建/测试成功、重检清零及 Patch 引用。报告交接校验函数 handoff_errors 检查已读取报告、生产任务与消费任务，以及修复条目对应关系。
 
-现有 repair.response.json 修复 finding-101，而所引用的全量报告包含 finding-001；EChecker 目前也未输出可直接交给 MDFixer 的报告引用。这些样例和 Schema 衔接需另行修正，本 ADR 不将其记为已完成。
+全量修复样例已对齐 finding-001；EChecker 已增加 finding_report 和报告内容，并提供独立的增量报告修复请求/响应样例。两条路径均加入契约回归校验。仍待实现：真实文件读取、摘要检查、实际仓库版本和运行结果验证。

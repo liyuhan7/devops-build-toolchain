@@ -88,7 +88,7 @@ docker://registry/repository@sha256:<digest> 表示容器镜像，去掉 docker:
 | MDFixer 输入报告 | 报告及各 finding 的提交和配置匹配当前任务；仅允许 MISSING，否则整体拒绝 |
 | Patch | repository_commit 表示补丁应用前的基准提交；实际应用及构建、测试、重检另行验证 |
 
-EChecker 当前响应没有 ERROR_REPORT 引用，需要后续补齐后才可直接交给 MDFixer；本约定不假定该链路已经实现。
+EChecker 响应通过 finding_report 提供 ERROR_REPORT 引用。对应报告及 repair-from-incremental 请求/响应样例已登记在 interface-index.json 的 report_handoffs 中；校验脚本检查两条报告交接链，真实文件读取仍待实现。
 
 ## 6. 失败语义
 

@@ -47,3 +47,7 @@ python scripts/validate.py
 - [产物读取约定](artifact-model.md)：共享目录/离线包、URI 映射、manifest、基线校验和错误处理。
 
 新增读取协议尚待配对组确认，仓库当前没有产物解析器或下载服务。
+
+## 报告交接样例
+
+interface-index.json 的 report_handoffs 登记全量检测到修复、增量检测到修复两条样例链。增量响应新增必填 finding_report（ERROR_REPORT 引用），内容见 echecker/incremental-check.finding-report.json；对应修复样例为 mdfixer/repair-from-incremental.request.json 和 .response.json。校验检查引用、报告内容、版本配置及修复条目对应关系，不执行 URI 下载。
